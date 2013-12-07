@@ -32,7 +32,7 @@ function RedisIncr (redis, flushAfter) {
  * @param {Number} increment
  */
 
-RedisIncr.prototype.incr = function (key, field, increment) {
+RedisIncr.prototype.increment = function (key, field, increment) {
   if (this.hashtable[key] === undefined)
     this.hashtable[key] = {};
   if (this.hashtable[key][field] === undefined)

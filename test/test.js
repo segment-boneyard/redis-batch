@@ -28,7 +28,6 @@ describe('RedisIncr', function () {
 
     it('should instantiate with just a redis', function () {
       var redis = {};
-      sinon.stub(redis, 'hincrby');
       try {
         var redisIncr = new RedisIncr(redis);
         assert(redisIncr);
@@ -39,7 +38,6 @@ describe('RedisIncr', function () {
 
     it('should override the default flushAfter if provided', function () {
       var redis = {};
-      sinon.stub(redis, 'hincrby');
       var redisIncr = new RedisIncr(redis, flushAfter);
       assert(redisIncr.flushAfter === flushAfter);
     });
@@ -56,7 +54,7 @@ describe('RedisIncr', function () {
     
     beforeEach(function () {
       var redis = {};
-      sinon.stub(redis, 'hincrby');
+      redis.hincrby = sinon.spy();
       redisIncr = new RedisIncr(redis, flushAfter);
     });
 
@@ -88,11 +86,12 @@ describe('RedisIncr', function () {
       return (flushAfter * flushes + 20);
     };
     
+    var redis;
     var redisIncr;
     
     beforeEach(function () {
-      var redis = {};
-      sinon.stub(redis, 'hincrby');
+      redis = {};
+      redis.hincrby = sinon.spy();
       redisIncr = new RedisIncr(redis, flushAfter);
     });
 
