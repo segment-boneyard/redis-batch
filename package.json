@@ -10,7 +10,7 @@
     "test": "make test"
   },
   "dependencies": {
-    "debug" : "0.7.3"
+    "underscore" : "*"
   },
   "devDependencies": {
     "mocha": "*",
