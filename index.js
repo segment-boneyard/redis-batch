@@ -37,6 +37,9 @@ RedisIncr.prototype.incr = function (key, field, increment) {
     this.hashtable[key] = {};
   if (this.hashtable[key][field] === undefined)
     this.hashtable[key][field] = 0;
+  
+  if (increment === undefined)
+    increment = 1;
 
   this.hashtable[key][field] += increment;
 };
