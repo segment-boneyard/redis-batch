@@ -22,6 +22,11 @@ function RedisIncr (redis, flushAfter) {
   this.redis = redis;
   this.flushAfter = flushAfter || 5000; // default to 5 seconds
   this.hashtable = {};
+
+  var self = this;
+  this.interval = setInterval(function () {
+    self.flush();
+  }, this.flushAfter);
 }
 
 /**
@@ -49,11 +54,13 @@ RedisIncr.prototype.increment = function (key, field, increment) {
  */
 
 RedisIncr.prototype.flush = function () {
-  var redis = this.redis;
-  _.each(_.keys(this.hashtable), function (key) {
-    _.each(_.keys(this.hashtable[key]), function (field) {
-      redis.hincrby(key, field, this.hashtable[key][field]);
-      this.hashtable[key][field] = 0;
+  var self = this;
+  var redis = self.redis;
+  _.each(_.keys(self.hashtable), function (key) {
+    _.each(_.keys(self.hashtable[key]), function (field) {
+      redis.hincrby(key, field, self.hashtable[key][field]);
+      delete self.hashtable[key][field];
     });
+    delete self.hashtable[key];
   });
 };
