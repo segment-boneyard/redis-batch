@@ -2,10 +2,10 @@
 var _ = require('underscore');
 
 /**
- * Expose `RedisIncr`.
+ * Expose `RedisIncrementBatch`.
  */
 
-module.exports = RedisIncr;
+module.exports = RedisIncrementBatch;
 
 /**
  * Initialize a new Redis Incr instance.
@@ -16,9 +16,9 @@ module.exports = RedisIncr;
  * @param {Number} flushAfter
  */
 
-function RedisIncr (redis, flushAfter) {
-  if (!(this instanceof RedisIncr)) return new RedisIncr(redis, flushAfter);
-  if (!redis) throw new Error('RedisIncr requires a redis instance.');
+function RedisIncrementBatch (redis, flushAfter) {
+  if (!(this instanceof RedisIncrementBatch)) return new RedisIncrementBatch(redis, flushAfter);
+  if (!redis) throw new Error('RedisIncrementBatch requires a redis instance.');
   this.redis = redis;
   this.flushAfter = flushAfter || 5000; // default to 5 seconds
   this.hashtable = {};
@@ -37,7 +37,7 @@ function RedisIncr (redis, flushAfter) {
  * @param {Number} increment
  */
 
-RedisIncr.prototype.increment = function (key, field, increment) {
+RedisIncrementBatch.prototype.increment = function (key, field, increment) {
   if (this.hashtable[key] === undefined)
     this.hashtable[key] = {};
   if (this.hashtable[key][field] === undefined)
@@ -53,7 +53,7 @@ RedisIncr.prototype.increment = function (key, field, increment) {
  * Flush everything in the hashtable to Redis.
  */
 
-RedisIncr.prototype.flush = function () {
+RedisIncrementBatch.prototype.flush = function () {
   var self = this;
   var redis = self.redis;
   _.each(_.keys(self.hashtable), function (key) {
