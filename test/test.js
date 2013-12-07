@@ -2,9 +2,9 @@ var assert = require('assert');
 var sinon = require('sinon');
 var _ = require('underscore');
 
-describe('RedisIncr', function () {
+describe('RedisIncrementBatch', function () {
 
-  var RedisIncr = require('../');
+  var RedisIncrementBatch = require('../');
 
   var key1 = 'key1';
   var key2 = 'key2';
@@ -19,7 +19,7 @@ describe('RedisIncr', function () {
 
     it('should error if not given a redis instance', function () {
       try {
-        var redisIncr = new RedisIncr();
+        var batch = new RedisIncrementBatch();
         assert(false);
       } catch (err) {
         assert(err);
@@ -29,8 +29,8 @@ describe('RedisIncr', function () {
     it('should instantiate with just a redis', function () {
       var redis = {};
       try {
-        var redisIncr = new RedisIncr(redis);
-        assert(redisIncr);
+        var batch = new RedisIncrementBatch(redis);
+        assert(batch);
       } catch (err) {
         assert(false);
       }
@@ -38,8 +38,8 @@ describe('RedisIncr', function () {
 
     it('should override the default flushAfter if provided', function () {
       var redis = {};
-      var redisIncr = new RedisIncr(redis, flushAfter);
-      assert(redisIncr.flushAfter === flushAfter);
+      var batch = new RedisIncrementBatch(redis, flushAfter);
+      assert(batch.flushAfter === flushAfter);
     });
 
   });
@@ -50,38 +50,38 @@ describe('RedisIncr', function () {
   
   describe('Increment', function () {
     
-    var redisIncr;
+    var batch;
     
     beforeEach(function () {
       var redis = {};
       redis.hincrby = sinon.spy();
-      redisIncr = new RedisIncr(redis, flushAfter);
+      batch = new RedisIncrementBatch(redis, flushAfter);
     });
 
     it('should increment by 1 by default', function () {
-      assert(redisIncr.hashtable[key1] === undefined);
-      redisIncr.increment(key1, fields[0]);
-      assert(redisIncr.hashtable[key1][fields[0]] === 1);
+      assert(batch.hashtable[key1] === undefined);
+      batch.increment(key1, fields[0]);
+      assert(batch.hashtable[key1][fields[0]] === 1);
     });
 
     it('should increment by a positive number if provided', function () {
-      assert(redisIncr.hashtable[key1] === undefined);
-      redisIncr.increment(key1, fields[2], 1238898);
-      assert(redisIncr.hashtable[key1][fields[2]] === 1238898);
+      assert(batch.hashtable[key1] === undefined);
+      batch.increment(key1, fields[2], 1238898);
+      assert(batch.hashtable[key1][fields[2]] === 1238898);
     });
 
     it('should increment by a negative number if provided', function () {
-      assert(redisIncr.hashtable[key2] === undefined);
-      redisIncr.increment(key2, fields[1], -81726);
-      assert(redisIncr.hashtable[key2][fields[1]] === -81726);
+      assert(batch.hashtable[key2] === undefined);
+      batch.increment(key2, fields[1], -81726);
+      assert(batch.hashtable[key2][fields[1]] === -81726);
     });
 
     it('should increment by a positive number after a negative number', function () {
-      assert(redisIncr.hashtable[key2] === undefined);
-      redisIncr.increment(key2, fields[1], -81726);
-      assert(redisIncr.hashtable[key2][fields[1]] === -81726);
-      redisIncr.increment(key2, fields[1], 81727);
-      assert(redisIncr.hashtable[key2][fields[1]] === 1);
+      assert(batch.hashtable[key2] === undefined);
+      batch.increment(key2, fields[1], -81726);
+      assert(batch.hashtable[key2][fields[1]] === -81726);
+      batch.increment(key2, fields[1], 81727);
+      assert(batch.hashtable[key2][fields[1]] === 1);
     });
 
   });
@@ -97,12 +97,12 @@ describe('RedisIncr', function () {
     };
     
     var redis;
-    var redisIncr;
+    var batch;
     
     beforeEach(function () {
       redis = {};
       redis.hincrby = sinon.spy();
-      redisIncr = new RedisIncr(redis, flushAfter);
+      batch = new RedisIncrementBatch(redis, flushAfter);
     });
 
     it('should not flush when nothing is incremented', function (done) {
@@ -118,7 +118,7 @@ describe('RedisIncr', function () {
     });
 
     it('should flush one key-field', function (done) {
-      redisIncr.increment(key1, fields[0]);
+      batch.increment(key1, fields[0]);
       done = _.after(2, done);
       var test = function () {
         assert(redis.hincrby.callCount === 1);
@@ -130,9 +130,9 @@ describe('RedisIncr', function () {
     });
 
     it('should flush several key-fields', function (done) {
-      redisIncr.increment(key1, fields[0]);
-      redisIncr.increment(key1, fields[2], 3);
-      redisIncr.increment(key1, fields[1], -40);
+      batch.increment(key1, fields[0]);
+      batch.increment(key1, fields[2], 3);
+      batch.increment(key1, fields[1], -40);
       done = _.after(2, done);
       var test = function () {
         assert(redis.hincrby.callCount === 3);
@@ -146,8 +146,8 @@ describe('RedisIncr', function () {
     });
 
     it('should flush several keys-field', function (done) {
-      redisIncr.increment(key1, fields[0]);
-      redisIncr.increment(key2, fields[2], 3);
+      batch.increment(key1, fields[0]);
+      batch.increment(key2, fields[2], 3);
       done = _.after(2, done);
       var test = function () {
         assert(redis.hincrby.callCount === 2);
@@ -160,19 +160,19 @@ describe('RedisIncr', function () {
     });
 
     it('should flush multiple increments of a key-field as one hincrby', function (done) {
-      redisIncr.increment(key1, fields[0]);
-      redisIncr.increment(key1, fields[0]);
-      redisIncr.increment(key1, fields[0]);
-      redisIncr.increment(key1, fields[0]);
-      redisIncr.increment(key1, fields[0]);
-      redisIncr.increment(key1, fields[0]);
-      redisIncr.increment(key1, fields[0]);
-      redisIncr.increment(key1, fields[0]);
-      redisIncr.increment(key1, fields[0]);
-      redisIncr.increment(key2, fields[0], 2);
-      redisIncr.increment(key2, fields[0], 2);
-      redisIncr.increment(key2, fields[0], 2);
-      redisIncr.increment(key2, fields[0], 2);
+      batch.increment(key1, fields[0]);
+      batch.increment(key1, fields[0]);
+      batch.increment(key1, fields[0]);
+      batch.increment(key1, fields[0]);
+      batch.increment(key1, fields[0]);
+      batch.increment(key1, fields[0]);
+      batch.increment(key1, fields[0]);
+      batch.increment(key1, fields[0]);
+      batch.increment(key1, fields[0]);
+      batch.increment(key2, fields[0], 2);
+      batch.increment(key2, fields[0], 2);
+      batch.increment(key2, fields[0], 2);
+      batch.increment(key2, fields[0], 2);
       done = _.after(2, done);
       var test = function () {
         assert(redis.hincrby.callCount === 2);

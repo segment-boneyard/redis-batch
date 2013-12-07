@@ -1,6 +1,6 @@
 {
-  "name": "redis-incr",
-  "repository": "segmentio/redis-incr",
+  "name": "redis-increment-batch",
+  "repository": "segmentio/redis-increment-batch",
   "description": "Batches increment commands to Redis.",
   "version": "0.0.1",
   "author": "Peter Reinhardt <peter@segment.io>",

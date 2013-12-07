@@ -1,23 +1,23 @@
-redis-incr
-==========
+redis-increment-batch
+=====================
 
-Redis incr wraps a [node_redis](https://github.com/mranney/node_redis) instance, and batches calls to increment. You can configure the time between flushes. The default time between flushes is 5 seconds.
+Redis Increment Batch wraps a [node_redis](https://github.com/mranney/node_redis) instance, and batches calls to hincrby. You can configure the time between flushes. The default time between flushes is 5 seconds.
 
 ## Usage
 
 ```javascript
-var RedisIncr = require('redis-incr');
+var RedisIncrementBatch = require('redis-increment-batch');
 
-var redisIncr = new RedisIncr(redis); // redis instance created elsewhere
+var batch = new RedisIncrementBatch(redis); // redis instance created elsewhere
 // OR
-var redisIncr = new RedisIncr(redis, 3000); // 3 second flushes
+var batch = new RedisIncrementBatch(redis, 3000); // 3 second flushes
 
 // default increment is 1
-redisIncr.increment('key', 'field');
+batch.increment('key', 'field');
 
 // but you can increment by whatever
-redisIncr.increment('project', 'counter', 12);
-redisIncr.increment('warehouse', 'pants', -2);
+batch.increment('project', 'counter', 12);
+batch.increment('warehouse', 'pants', -2);
 ```
 
 ## License (MIT)
