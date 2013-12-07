@@ -59,19 +59,29 @@ describe('RedisIncr', function () {
     });
 
     it('should increment by 1 by default', function () {
-
+      assert(redisIncr.hashtable[key1] === undefined);
+      redisIncr.increment(key1, fields[0]);
+      assert(redisIncr.hashtable[key1][fields[0]] === 1);
     });
 
     it('should increment by a positive number if provided', function () {
-
+      assert(redisIncr.hashtable[key1] === undefined);
+      redisIncr.increment(key1, fields[2], 1238898);
+      assert(redisIncr.hashtable[key1][fields[2]] === 1238898);
     });
 
     it('should increment by a negative number if provided', function () {
-
+      assert(redisIncr.hashtable[key2] === undefined);
+      redisIncr.increment(key2, fields[1], -81726);
+      assert(redisIncr.hashtable[key2][fields[1]] === -81726);
     });
 
     it('should increment by a positive number after a negative number', function () {
-
+      assert(redisIncr.hashtable[key2] === undefined);
+      redisIncr.increment(key2, fields[1], -81726);
+      assert(redisIncr.hashtable[key2][fields[1]] === -81726);
+      redisIncr.increment(key2, fields[1], 81727);
+      assert(redisIncr.hashtable[key2][fields[1]] === 1);
     });
 
   });
@@ -143,6 +153,31 @@ describe('RedisIncr', function () {
         assert(redis.hincrby.callCount === 2);
         assert(redis.hincrby.calledWith(key1, fields[0], 1));
         assert(redis.hincrby.calledWith(key2, fields[2], 3));
+        done();
+      };
+      setTimeout(test, flushes(1));
+      setTimeout(test, flushes(4));
+    });
+
+    it('should flush multiple increments of a key-field as one hincrby', function (done) {
+      redisIncr.increment(key1, fields[0]);
+      redisIncr.increment(key1, fields[0]);
+      redisIncr.increment(key1, fields[0]);
+      redisIncr.increment(key1, fields[0]);
+      redisIncr.increment(key1, fields[0]);
+      redisIncr.increment(key1, fields[0]);
+      redisIncr.increment(key1, fields[0]);
+      redisIncr.increment(key1, fields[0]);
+      redisIncr.increment(key1, fields[0]);
+      redisIncr.increment(key2, fields[0], 2);
+      redisIncr.increment(key2, fields[0], 2);
+      redisIncr.increment(key2, fields[0], 2);
+      redisIncr.increment(key2, fields[0], 2);
+      done = _.after(2, done);
+      var test = function () {
+        assert(redis.hincrby.callCount === 2);
+        assert(redis.hincrby.calledWith(key1, fields[0], 9));
+        assert(redis.hincrby.calledWith(key2, fields[0], 8));
         done();
       };
       setTimeout(test, flushes(1));
