@@ -1,24 +1,45 @@
-redis-increment-batch
-=====================
+redis-batch
+===========
 
-Redis Increment Batch wraps a [node_redis](https://github.com/mranney/node_redis) instance, and batches calls to hincrby. You can configure the time between flushes. The default time between flushes is 5 seconds.
+Redis Batch wraps a [node_redis](https://github.com/mranney/node_redis) instance, and batches calls to hincrby, incrby and sadd. You can configure the time between flushes. The default time between flushes is 5 seconds.
 
 ## Usage
 
 ```javascript
-var RedisIncrementBatch = require('redis-increment-batch');
+var RedisBatch = require('redis-batch');
 
-var batch = new RedisIncrementBatch(redis); // redis instance created elsewhere
-// OR
-var batch = new RedisIncrementBatch(redis, { flushAfter: 3000 }); // 3 second flushes
+var redisBatch = new RedisBatch(redis); // redis instance created elsewhere
+var redisBatch = new RedisBatch(redis, { flushAfter: 3000 });
 
-// default increment is 1
-batch.increment('key', 'field');
+/**
+ * hincrby batches by key:field
+ * This will become a single "hincrby warehouse pants -6" when sent to redis.
+ */
 
-// but you can increment by whatever
-batch.increment('project', 'counter', 12);
-batch.increment('warehouse', 'pants', -2);
+redisBatch.hincrby('warehouse', 'pants', -2)
+    .hincrby('warehouse', 'pants', -1)
+    .hincrby('warehouse', 'pants', -3);
+
+/**
+ * incrby batches by key
+ * This will become a single "incrby projectcounter 22" when sent to redis.
+ */
+
+redisBatch.incrby('projectcounter', 12)
+    .incrby('projectcounter', 6)
+    .incrby('projectcounter', 4);
+
+/**
+ * sadd batches by setkey
+ * This will become a single "sadd mysetkey key1 key2 key3" when sent to redis.
+ */
+
+redisBatch.sadd('mysetkey', 'key1')
+    .sadd('mysetkey', 'key2')
+    .sadd('mysetkey', 'key3');
 ```
+
+You can intermingle sadd, incrby and hincrby as you desire.
 
 ## License (MIT)
 

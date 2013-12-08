@@ -2,29 +2,31 @@
 var defaults = require('defaults');
 
 /**
- * Expose `RedisIncrementBatch`.
+ * Expose `RedisBatch`.
  */
 
-module.exports = RedisIncrementBatch;
+module.exports = RedisBatch;
 
 /**
- * Initialize a new Redis Incr instance.
+ * Initialize a new Redis Batch instance.
  *
- * Takes a redis instance and a flush after interval.
+ * Takes a redis instance and options to control the flust interval.
  *
  * @param {Redis} redis
  * @param {Object} options
- *  @param {Number} flushAfter
+ *   @param {Number} flushAfter
  */
 
-function RedisIncrementBatch (redis, options) {
-  if (!(this instanceof RedisIncrementBatch)) return new RedisIncrementBatch(redis, options);
-  if (!redis) throw new Error('RedisIncrementBatch requires a redis instance.');
+function RedisBatch (redis, options) {
+  if (!(this instanceof RedisBatch)) return new RedisBatch(redis, options);
+  if (!redis) throw new Error('RedisBatch requires a redis instance.');
   this.redis = redis;
   this.options = defaults(options, {
     flushAfter : 5000
   });
-  this.hashtable = {};
+  this.sadd = {};
+  this.incrby = {};
+  this.hincrby = {};
 
   var self = this;
   this.interval = setInterval(function () {
@@ -33,36 +35,92 @@ function RedisIncrementBatch (redis, options) {
 }
 
 /**
+ * Add a key to a set.
+ *
+ * @param {String} set
+ * @param {String} key
+ */
+
+RedisBatch.prototype.sadd = function (set, key) {
+  if (this.sadd[set] === undefined) this.sadd[set] = {};
+  this.sadd[set][key] = true;
+};
+
+/**
+ * Flush all the sadd commands.
+ */
+
+RedisBatch.prototype.saddFlush = function () {
+  var self = this;
+  var redis = self.redis;
+  Object.keys(self.sadd).forEach(function (set) {
+    redis.sadd(set, Object.keys(self.sadd[set]));
+  });
+  this.sadd = {};
+};
+
+/**
  * Increment a key.
+ *
+ * @param {String} key
+ * @param {Number} increment
+ */
+
+RedisBatch.prototype.incrby = function (key, increment) {
+  if (this.incrby[key] === undefined) this.incrby[key] = {};
+  if (increment === undefined) increment = 1;
+  this.incrby[key] += increment;
+};
+
+/**
+ * Flush all the incrby commands.
+ */
+
+RedisBatch.prototype.incrbyFlush = function () {
+  var self = this;
+  var redis = self.redis;
+  Object.keys(self.incrby).forEach(function (key) {
+    redis.incrby(key, self.incrby[key]);
+  });
+  this.incrby = {};
+};
+
+/**
+ * Increment a hash key.
  *
  * @param {String} hash key
  * @param {String} field
  * @param {Number} increment
  */
 
-RedisIncrementBatch.prototype.increment = function (key, field, increment) {
-  if (this.hashtable[key] === undefined)
-    this.hashtable[key] = {};
-  if (this.hashtable[key][field] === undefined)
-    this.hashtable[key][field] = 0;
+RedisBatch.prototype.hincrby = function (key, field, increment) {
+  if (this.hincrby[key] === undefined) this.hincrby[key] = {};
+  if (this.hincrby[key][field] === undefined) this.hincrby[key][field] = 0;
+  if (increment === undefined) increment = 1;
+  this.hincrby[key][field] += increment;
+};
 
-  if (increment === undefined)
-    increment = 1;
+/**
+ * Flush all the hincrby commands.
+ */
 
-  this.hashtable[key][field] += increment;
+RedisBatch.prototype.hincrbyFlush = function () {
+  var self = this;
+  var redis = self.redis;
+  Object.keys(self.hincrby).forEach(function (key) {
+    Object.keys(self.hincrby[key]).forEach(function (field) {
+      redis.hincrby(key, field, self.hincrby[key][field]);
+    });
+  });
+  this.hincrby = {};
 };
 
 /**
  * Flush everything in the hashtable to Redis.
  */
 
-RedisIncrementBatch.prototype.flush = function () {
-  var self = this;
-  var redis = self.redis;
-  Object.keys(self.hashtable).forEach(function (key) {
-    Object.keys(self.hashtable[key]).forEach(function (field) {
-      redis.hincrby(key, field, self.hashtable[key][field]);
-    });
-  });
-  this.hashtable = {};
+RedisBatch.prototype.flush = function () {
+  this.saddFlush();
+  this.incrbyFlush();
+  this.hincrbyFlush();
 };

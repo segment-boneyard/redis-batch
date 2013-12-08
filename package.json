@@ -1,8 +1,8 @@
 {
-  "name": "redis-increment-batch",
-  "repository": "segmentio/redis-increment-batch",
-  "description": "Batches increment commands to Redis.",
-  "version": "0.0.2",
+  "name": "redis-batch",
+  "repository": "segmentio/redis-batch",
+  "description": "Batches commands like incrby, hincrby and sadd to Redis.",
+  "version": "0.1.0",
   "author": "Peter Reinhardt <peter@segment.io>",
   "main": "index.js",
   "license": "MIT",
