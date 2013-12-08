@@ -7,7 +7,9 @@ describe('RedisBatch', function () {
 
   var key1 = 'key1';
   var key2 = 'key2';
-  var fields = ['mobile', 'server', 'browser'];
+  var field1 = 'mobile';
+  var field2 = 'server';
+  var field3 = 'browser';
   var flushAfter = 50;
 
   var redisSpy = function () {
@@ -183,28 +185,28 @@ describe('RedisBatch', function () {
 
       it('should hincrby 1 by default', function () {
         assert(batch.batch.hincrby[key1] === undefined);
-        batch.hincrby(key1, fields[0]);
-        assert(batch.batch.hincrby[key1][fields[0]] === 1);
+        batch.hincrby(key1, field1);
+        assert(batch.batch.hincrby[key1][field1] === 1);
       });
 
       it('should hincrby a positive number if provided', function () {
         assert(batch.batch.hincrby[key1] === undefined);
-        batch.hincrby(key1, fields[2], 1238898);
-        assert(batch.batch.hincrby[key1][fields[2]] === 1238898);
+        batch.hincrby(key1, field3, 1238898);
+        assert(batch.batch.hincrby[key1][field3] === 1238898);
       });
 
       it('should hincrby a negative number if provided', function () {
         assert(batch.batch.hincrby[key2] === undefined);
-        batch.hincrby(key2, fields[1], -81726);
-        assert(batch.batch.hincrby[key2][fields[1]] === -81726);
+        batch.hincrby(key2, field2, -81726);
+        assert(batch.batch.hincrby[key2][field2] === -81726);
       });
 
       it('should hincrby a positive number after a negative number', function () {
         assert(batch.batch.hincrby[key2] === undefined);
-        batch.hincrby(key2, fields[1], -81726);
-        assert(batch.batch.hincrby[key2][fields[1]] === -81726);
-        batch.hincrby(key2, fields[1], 81727);
-        assert(batch.batch.hincrby[key2][fields[1]] === 1);
+        batch.hincrby(key2, field2, -81726);
+        assert(batch.batch.hincrby[key2][field2] === -81726);
+        batch.hincrby(key2, field2, 81727);
+        assert(batch.batch.hincrby[key2][field2] === 1);
       });
 
     });
@@ -223,10 +225,10 @@ describe('RedisBatch', function () {
       });
 
       it('should flush one key-field', function (done) {
-        batch.hincrby(key1, fields[0]);
+        batch.hincrby(key1, field1);
         var test = function () {
           assert(redis.hincrby.callCount === 1);
-          assert(redis.hincrby.calledWith(key1, fields[0], 1));
+          assert(redis.hincrby.calledWith(key1, field1, 1));
         };
         setTimeout(test, flushes(1));
         setTimeout(test, flushes(4));
@@ -234,14 +236,14 @@ describe('RedisBatch', function () {
       });
 
       it('should flush several key-fields', function (done) {
-        batch.hincrby(key1, fields[0]);
-        batch.hincrby(key1, fields[2], 3);
-        batch.hincrby(key1, fields[1], -40);
+        batch.hincrby(key1, field1);
+        batch.hincrby(key1, field3, 3);
+        batch.hincrby(key1, field2, -40);
         var test = function () {
           assert(redis.hincrby.callCount === 3);
-          assert(redis.hincrby.calledWith(key1, fields[0], 1));
-          assert(redis.hincrby.calledWith(key1, fields[1], -40));
-          assert(redis.hincrby.calledWith(key1, fields[2], 3));
+          assert(redis.hincrby.calledWith(key1, field1, 1));
+          assert(redis.hincrby.calledWith(key1, field2, -40));
+          assert(redis.hincrby.calledWith(key1, field3, 3));
         };
         setTimeout(test, flushes(1));
         setTimeout(test, flushes(4));
@@ -249,12 +251,12 @@ describe('RedisBatch', function () {
       });
 
       it('should flush several keys-field', function (done) {
-        batch.hincrby(key1, fields[0]);
-        batch.hincrby(key2, fields[2], 3);
+        batch.hincrby(key1, field1);
+        batch.hincrby(key2, field3, 3);
         var test = function () {
           assert(redis.hincrby.callCount === 2);
-          assert(redis.hincrby.calledWith(key1, fields[0], 1));
-          assert(redis.hincrby.calledWith(key2, fields[2], 3));
+          assert(redis.hincrby.calledWith(key1, field1, 1));
+          assert(redis.hincrby.calledWith(key2, field3, 3));
         };
         setTimeout(test, flushes(1));
         setTimeout(test, flushes(4));
@@ -262,23 +264,126 @@ describe('RedisBatch', function () {
       });
 
       it('should flush multiple hincrby of a key-field as one hincrby', function (done) {
-        batch.hincrby(key1, fields[0])
-          .hincrby(key1, fields[0])
-          .hincrby(key1, fields[0])
-          .hincrby(key1, fields[0])
-          .hincrby(key1, fields[0])
-          .hincrby(key1, fields[0])
-          .hincrby(key1, fields[0])
-          .hincrby(key1, fields[0])
-          .hincrby(key1, fields[0])
-          .hincrby(key2, fields[0], 2)
-          .hincrby(key2, fields[0], 2)
-          .hincrby(key2, fields[0], 2)
-          .hincrby(key2, fields[0], 3);
+        batch.hincrby(key1, field1)
+          .hincrby(key1, field1)
+          .hincrby(key1, field1)
+          .hincrby(key1, field1)
+          .hincrby(key1, field1)
+          .hincrby(key1, field1)
+          .hincrby(key1, field1)
+          .hincrby(key1, field1)
+          .hincrby(key1, field1)
+          .hincrby(key2, field1, 2)
+          .hincrby(key2, field1, 2)
+          .hincrby(key2, field1, 2)
+          .hincrby(key2, field1, 3);
         var test = function () {
           assert(redis.hincrby.callCount === 2);
-          assert(redis.hincrby.calledWith(key1, fields[0], 9));
-          assert(redis.hincrby.calledWith(key2, fields[0], 9));
+          assert(redis.hincrby.calledWith(key1, field1, 9));
+          assert(redis.hincrby.calledWith(key2, field1, 9));
+        };
+        setTimeout(test, flushes(1));
+        setTimeout(test, flushes(4));
+        setTimeout(done, flushes(5));
+      });
+
+    });
+
+  });
+
+  /**
+   * sadd tests
+   */
+  
+  describe('sadd', function () {
+    
+    var redis;
+    var batch;
+    
+    beforeEach(function () {
+      redis = redisSpy();
+      batch = new RedisBatch(redis, { flushAfter: flushAfter });
+    });
+
+    describe('batching', function () {
+
+      it('should sadd a single member', function () {
+        assert.equal(batch.batch.sadd[key1], undefined);
+        batch.sadd(key1, field1);
+        assert.deepEqual(Object.keys(batch.batch.sadd[key1]), [field1]);
+      });
+
+      it('should sadd multiple members to one key', function () {
+        assert.equal(batch.batch.sadd[key1], undefined);
+        batch.sadd(key1, field1);
+        batch.sadd(key1, field1);
+        batch.sadd(key1, field3);
+        batch.sadd(key1, field2);
+        assert.deepEqual(Object.keys(batch.batch.sadd[key1]), [field1, field3, field2]);
+      });
+
+      it('should add multiple members to multiple keys', function () {
+        assert.equal(batch.batch.sadd[key1], undefined);
+        batch.sadd(key1, field1)
+          .sadd(key1, field1)
+          .sadd(key1, field3)
+          .sadd(key1, field2)
+          .sadd(key2, field2)
+          .sadd(key2, field3);
+        assert.deepEqual(Object.keys(batch.batch.sadd[key1]), [field1, field3, field2]);
+        assert.deepEqual(Object.keys(batch.batch.sadd[key2]), [field2, field3]);
+      });
+
+    });
+
+    describe('flushing', function () {
+
+      it('should not flush when no members are added', function (done) {
+        var test = function () {
+          assert.equal(redis.sadd.callCount, 0);
+        };
+        setTimeout(test, flushes(1));
+        setTimeout(test, flushes(2));
+        setTimeout(test, flushes(3));
+        setTimeout(test, flushes(4));
+        setTimeout(done, flushes(5));
+      });
+
+      it('should flush a single key and member', function (done) {
+        batch.sadd(key1, field1);
+        var test = function () {
+          assert.equal(redis.sadd.callCount, 1);
+          assert(redis.sadd.calledWith(key1, [field1]));
+        };
+        setTimeout(test, flushes(1));
+        setTimeout(test, flushes(4));
+        setTimeout(done, flushes(5));
+      });
+
+      it('should flush a single key with multiple members', function (done) {
+        batch.sadd(key1, field1)
+          .sadd(key1, field2)
+          .sadd(key1, field1)
+          .sadd(key1, field3);
+        var test = function () {
+          assert.equal(redis.sadd.callCount, 1);
+          assert(redis.sadd.calledWith(key1, [field1, field2, field3]));
+        };
+        setTimeout(test, flushes(1));
+        setTimeout(test, flushes(4));
+        setTimeout(done, flushes(5));
+      });
+
+      it('should flush multiple keys', function (done) {
+        batch.sadd(key1, field1)
+          .sadd(key1, field2)
+          .sadd(key1, field1)
+          .sadd(key1, field3)
+          .sadd(key2, field1);
+        var test = function () {
+          assert.equal(redis.sadd.callCount, 2);
+          assert(redis.sadd.calledWith(key1, [field1, field2, field3]));
+          assert(redis.sadd.calledWith(key2, [field1]));
         };
         setTimeout(test, flushes(1));
         setTimeout(test, flushes(4));
