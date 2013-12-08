@@ -1,7 +1,7 @@
 redis-batch
 ===========
 
-Redis Batch wraps a [node_redis](https://github.com/mranney/node_redis) instance, and batches calls to hincrby, incrby and sadd. You can configure the time between flushes. The default time between flushes is 5 seconds.
+Redis Batch wraps a [node_redis](https://github.com/mranney/node_redis) instance, and batches calls to hincrby, incrby, pexpire and sadd. You can configure the time between flushes. The default time between flushes is 5 seconds.
 
 ## Usage
 
