@@ -10,18 +10,20 @@ describe('RedisBatch', function () {
   var field1 = 'mobile';
   var field2 = 'server';
   var field3 = 'browser';
-  var flushAfter = 50;
+  var expire = 1000;
+  var flushAfter = 10;
 
   var redisSpy = function () {
     return {
       incrby: sinon.spy(),
       hincrby: sinon.spy(),
-      sadd: sinon.spy()
+      sadd: sinon.spy(),
+      pexpire: sinon.spy()
     };
   };
 
   var flushes = function (flushes) {
-    return (flushAfter * flushes + 20);
+    return (flushAfter * flushes + 5);
   };
 
   /**
@@ -281,6 +283,109 @@ describe('RedisBatch', function () {
           assert(redis.hincrby.callCount === 2);
           assert(redis.hincrby.calledWith(key1, field1, 9));
           assert(redis.hincrby.calledWith(key2, field1, 9));
+        };
+        setTimeout(test, flushes(1));
+        setTimeout(test, flushes(4));
+        setTimeout(done, flushes(5));
+      });
+
+    });
+
+  });
+
+  /**
+   * pexpire tests
+   */
+  
+  describe('pexpire', function () {
+    
+    var redis;
+    var batch;
+    
+    beforeEach(function () {
+      redis = redisSpy();
+      batch = new RedisBatch(redis, { flushAfter: flushAfter });
+    });
+
+    describe('batching', function () {
+
+      it('should pexpire a single key', function () {
+        assert.equal(batch.batch.pexpire[key1], undefined);
+        batch.pexpire(key1, expire);
+        assert.equal(batch.batch.pexpire[key1], expire);
+      });
+
+      it('should pexpire multiple expires to one', function () {
+        assert.equal(batch.batch.pexpire[key1], undefined);
+        batch.pexpire(key1, expire+100);
+        batch.pexpire(key1, expire-100);
+        batch.pexpire(key1, expire+123);
+        batch.pexpire(key1, expire);
+        assert.equal(batch.batch.pexpire[key1], expire);
+      });
+
+      it('should pexpire multiple keys', function () {
+        assert.equal(batch.batch.pexpire[key1], undefined);
+        batch.pexpire(key1, expire)
+          .pexpire(key1, expire)
+          .pexpire(key1, expire)
+          .pexpire(key1, expire)
+          .pexpire(key2, expire)
+          .pexpire(key2, expire);
+        assert.deepEqual(batch.batch.pexpire[key1], expire);
+        assert.deepEqual(batch.batch.pexpire[key2], expire);
+      });
+
+    });
+
+    describe('flushing', function () {
+
+      it('should not flush when no pexpires are added', function (done) {
+        var test = function () {
+          assert.equal(redis.pexpire.callCount, 0);
+        };
+        setTimeout(test, flushes(1));
+        setTimeout(test, flushes(2));
+        setTimeout(test, flushes(3));
+        setTimeout(test, flushes(4));
+        setTimeout(done, flushes(5));
+      });
+
+      it('should flush a single pexpire', function (done) {
+        batch.pexpire(key1, expire);
+        var test = function () {
+          assert.equal(redis.pexpire.callCount, 1);
+          assert(redis.pexpire.calledWith(key1, expire));
+        };
+        setTimeout(test, flushes(1));
+        setTimeout(test, flushes(4));
+        setTimeout(done, flushes(5));
+      });
+
+      it('should flush a single pexpire for one key', function (done) {
+        batch.pexpire(key1, expire)
+          .pexpire(key1, expire)
+          .pexpire(key1, expire)
+          .pexpire(key1, expire);
+        var test = function () {
+          assert.equal(redis.pexpire.callCount, 1);
+          assert(redis.pexpire.calledWith(key1, expire));
+        };
+        setTimeout(test, flushes(1));
+        setTimeout(test, flushes(4));
+        setTimeout(done, flushes(5));
+      });
+
+      it('should flush multiple pexpires for multiple keys', function (done) {
+        batch.pexpire(key1, expire)
+          .pexpire(key1, expire)
+          .pexpire(key1, expire)
+          .pexpire(key1, expire)
+          .pexpire(key2, expire);
+        var test = function () {
+          assert.equal(redis.pexpire.callCount, 2);
+          assert(redis.pexpire.calledWith(key1, expire));
+          assert(redis.pexpire.calledWith(key2, expire));
         };
         setTimeout(test, flushes(1));
         setTimeout(test, flushes(4));

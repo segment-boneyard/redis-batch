@@ -30,6 +30,15 @@ redisBatch.incrby('projectcounter', 12)
     .incrby('projectcounter', 4);
 
 /**
+ * pexpire de-duplicates by key
+ * This will become a single "pexpire key 1000" when sent to redis.
+ */
+
+redisBatch.pexpire('key', 1000)
+    .pexpire('key', 1000)
+    .pexpire('key', 1000);
+
+/**
  * sadd batches by key
  * This will become a single "sadd key member1 member2 member3" when sent to redis.
  */

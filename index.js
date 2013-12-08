@@ -25,68 +25,16 @@ function RedisBatch (redis, options) {
     flushAfter : 5000
   });
   this.batch = {};
-  this.batch.sadd = {};
-  this.batch.incrby = {};
   this.batch.hincrby = {};
+  this.batch.incrby = {};
+  this.batch.sadd = {};
+  this.batch.pexpire = {};
 
   var self = this;
   this.interval = setInterval(function () {
     self.flush();
   }, this.options.flushAfter);
 }
-
-/**
- * Add a key to a set.
- *
- * @param {String} set
- * @param {String} key
- */
-
-RedisBatch.prototype.sadd = function (key, member) {
-  if (this.batch.sadd[key] === undefined) this.batch.sadd[key] = {};
-  this.batch.sadd[key][member] = true;
-  return this;
-};
-
-/**
- * Flush all the sadd commands.
- */
-
-RedisBatch.prototype.saddFlush = function () {
-  var redis = this.redis;
-  var batch = this.batch.sadd;
-  Object.keys(batch).forEach(function (key) {
-    redis.sadd(key, Object.keys(batch[key]));
-  });
-  this.batch.sadd = {};
-};
-
-/**
- * Increment a key.
- *
- * @param {String} key
- * @param {Number} increment
- */
-
-RedisBatch.prototype.incrby = function (key, increment) {
-  if (this.batch.incrby[key] === undefined) this.batch.incrby[key] = 0;
-  if (increment === undefined) increment = 1;
-  this.batch.incrby[key] += increment;
-  return this;
-};
-
-/**
- * Flush all the incrby commands.
- */
-
-RedisBatch.prototype.incrbyFlush = function () {
-  var batch = this.batch.incrby;
-  var redis = this.redis;
-  Object.keys(batch).forEach(function (key) {
-    redis.incrby(key, batch[key]);
-  });
-  this.batch.incrby = {};
-};
 
 /**
  * Increment a hash key.
@@ -120,11 +68,93 @@ RedisBatch.prototype.hincrbyFlush = function () {
 };
 
 /**
+ * Increment a key.
+ *
+ * @param {String} key
+ * @param {Number} increment
+ */
+
+RedisBatch.prototype.incrby = function (key, increment) {
+  if (this.batch.incrby[key] === undefined) this.batch.incrby[key] = 0;
+  if (increment === undefined) increment = 1;
+  this.batch.incrby[key] += increment;
+  return this;
+};
+
+/**
+ * Flush all the incrby commands.
+ */
+
+RedisBatch.prototype.incrbyFlush = function () {
+  var batch = this.batch.incrby;
+  var redis = this.redis;
+  Object.keys(batch).forEach(function (key) {
+    redis.incrby(key, batch[key]);
+  });
+  this.batch.incrby = {};
+};
+
+/**
+ * Set the expire date for a key.
+ *
+ * pexpire is not batcheable, so we just de-dupe with a hashtable.
+ *
+ * @param {String} key
+ * @param {Number} milliseconds
+ */
+
+RedisBatch.prototype.pexpire = function (key, milliseconds) {
+  this.batch.pexpire[key] = milliseconds;
+  return this;
+};
+
+/**
+ * Flush all the incrby commands.
+ */
+
+RedisBatch.prototype.pexpireFlush = function () {
+  var batch = this.batch.pexpire;
+  var redis = this.redis;
+  Object.keys(batch).forEach(function (key) {
+    redis.pexpire(key, batch[key]);
+  });
+  this.batch.pexpire = {};
+};
+
+
+/**
+ * Add a key to a set.
+ *
+ * @param {String} set
+ * @param {String} key
+ */
+
+RedisBatch.prototype.sadd = function (key, member) {
+  if (this.batch.sadd[key] === undefined) this.batch.sadd[key] = {};
+  this.batch.sadd[key][member] = true;
+  return this;
+};
+
+/**
+ * Flush all the sadd commands.
+ */
+
+RedisBatch.prototype.saddFlush = function () {
+  var redis = this.redis;
+  var batch = this.batch.sadd;
+  Object.keys(batch).forEach(function (key) {
+    redis.sadd(key, Object.keys(batch[key]));
+  });
+  this.batch.sadd = {};
+};
+
+/**
  * Flush everything in the hashtable to Redis.
  */
 
 RedisBatch.prototype.flush = function () {
-  this.saddFlush();
-  this.incrbyFlush();
   this.hincrbyFlush();
+  this.incrbyFlush();
+  this.saddFlush();
+  this.pexpireFlush();
 };
