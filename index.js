@@ -24,9 +24,10 @@ function RedisBatch (redis, options) {
   this.options = defaults(options, {
     flushAfter : 5000
   });
-  this.sadd = {};
-  this.incrby = {};
-  this.hincrby = {};
+  this.batch = {};
+  this.batch.sadd = {};
+  this.batch.incrby = {};
+  this.batch.hincrby = {};
 
   var self = this;
   this.interval = setInterval(function () {
@@ -42,8 +43,9 @@ function RedisBatch (redis, options) {
  */
 
 RedisBatch.prototype.sadd = function (key, member) {
-  if (this.sadd[key] === undefined) this.sadd[key] = {};
-  this.sadd[key][member] = true;
+  if (this.batch.sadd[key] === undefined) this.batch.sadd[key] = {};
+  this.batch.sadd[key][member] = true;
+  return this;
 };
 
 /**
@@ -51,12 +53,12 @@ RedisBatch.prototype.sadd = function (key, member) {
  */
 
 RedisBatch.prototype.saddFlush = function () {
-  var self = this;
-  var redis = self.redis;
-  Object.keys(self.sadd).forEach(function (key) {
-    redis.sadd(key, Object.keys(self.sadd[key]));
+  var redis = this.redis;
+  var batch = this.batch.sadd;
+  Object.keys(batch).forEach(function (key) {
+    redis.sadd(key, Object.keys(batch[key]));
   });
-  this.sadd = {};
+  this.batch.sadd = {};
 };
 
 /**
@@ -67,9 +69,10 @@ RedisBatch.prototype.saddFlush = function () {
  */
 
 RedisBatch.prototype.incrby = function (key, increment) {
-  if (this.incrby[key] === undefined) this.incrby[key] = {};
+  if (this.batch.incrby[key] === undefined) this.batch.incrby[key] = 0;
   if (increment === undefined) increment = 1;
-  this.incrby[key] += increment;
+  this.batch.incrby[key] += increment;
+  return this;
 };
 
 /**
@@ -77,12 +80,12 @@ RedisBatch.prototype.incrby = function (key, increment) {
  */
 
 RedisBatch.prototype.incrbyFlush = function () {
-  var self = this;
-  var redis = self.redis;
-  Object.keys(self.incrby).forEach(function (key) {
-    redis.incrby(key, self.incrby[key]);
+  var batch = this.batch.incrby;
+  var redis = this.redis;
+  Object.keys(batch).forEach(function (key) {
+    redis.incrby(key, batch[key]);
   });
-  this.incrby = {};
+  this.batch.incrby = {};
 };
 
 /**
@@ -94,10 +97,11 @@ RedisBatch.prototype.incrbyFlush = function () {
  */
 
 RedisBatch.prototype.hincrby = function (key, field, increment) {
-  if (this.hincrby[key] === undefined) this.hincrby[key] = {};
-  if (this.hincrby[key][field] === undefined) this.hincrby[key][field] = 0;
+  if (this.batch.hincrby[key] === undefined) this.batch.hincrby[key] = {};
+  if (this.batch.hincrby[key][field] === undefined) this.batch.hincrby[key][field] = 0;
   if (increment === undefined) increment = 1;
-  this.hincrby[key][field] += increment;
+  this.batch.hincrby[key][field] += increment;
+  return this;
 };
 
 /**
@@ -105,14 +109,14 @@ RedisBatch.prototype.hincrby = function (key, field, increment) {
  */
 
 RedisBatch.prototype.hincrbyFlush = function () {
-  var self = this;
-  var redis = self.redis;
-  Object.keys(self.hincrby).forEach(function (key) {
-    Object.keys(self.hincrby[key]).forEach(function (field) {
-      redis.hincrby(key, field, self.hincrby[key][field]);
+  var batch = this.batch.hincrby;
+  var redis = this.redis;
+  Object.keys(batch).forEach(function (key) {
+    Object.keys(batch[key]).forEach(function (field) {
+      redis.hincrby(key, field, batch[key][field]);
     });
   });
-  this.hincrby = {};
+  this.batch.hincrby = {};
 };
 
 /**
