@@ -10,7 +10,7 @@ var RedisIncrementBatch = require('redis-increment-batch');
 
 var batch = new RedisIncrementBatch(redis); // redis instance created elsewhere
 // OR
-var batch = new RedisIncrementBatch(redis, 3000); // 3 second flushes
+var batch = new RedisIncrementBatch(redis, { flushAfter: 3000 }); // 3 second flushes
 
 // default increment is 1
 batch.increment('key', 'field');
