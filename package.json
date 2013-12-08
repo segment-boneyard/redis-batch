@@ -2,7 +2,7 @@
   "name": "redis-batch",
   "repository": "segmentio/redis-batch",
   "description": "Batches commands like incrby, hincrby and sadd to Redis.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Peter Reinhardt <peter@segment.io>",
   "main": "index.js",
   "license": "MIT",
