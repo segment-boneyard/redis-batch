@@ -10,10 +10,11 @@
     "test": "make test"
   },
   "dependencies": {
-    "underscore" : "*"
+    "defaults" : "1.0.0"
   },
   "devDependencies": {
     "mocha": "*",
-    "sinon": "*"
+    "sinon": "*",
+    "after": "*"
   }
 }

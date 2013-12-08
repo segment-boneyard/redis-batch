@@ -1,5 +1,5 @@
 
-var _ = require('underscore');
+var defaults = require('defaults');
 
 /**
  * Expose `RedisIncrementBatch`.
@@ -13,20 +13,23 @@ module.exports = RedisIncrementBatch;
  * Takes a redis instance and a flush after interval.
  *
  * @param {Redis} redis
- * @param {Number} flushAfter
+ * @param {Object} options
+ *  @param {Number} flushAfter
  */
 
-function RedisIncrementBatch (redis, flushAfter) {
-  if (!(this instanceof RedisIncrementBatch)) return new RedisIncrementBatch(redis, flushAfter);
+function RedisIncrementBatch (redis, options) {
+  if (!(this instanceof RedisIncrementBatch)) return new RedisIncrementBatch(redis, options);
   if (!redis) throw new Error('RedisIncrementBatch requires a redis instance.');
   this.redis = redis;
-  this.flushAfter = flushAfter || 5000; // default to 5 seconds
+  this.options = defaults(options, {
+    flushAfter : 5000
+  });
   this.hashtable = {};
 
   var self = this;
   this.interval = setInterval(function () {
     self.flush();
-  }, this.flushAfter);
+  }, this.options.flushAfter);
 }
 
 /**
@@ -56,11 +59,10 @@ RedisIncrementBatch.prototype.increment = function (key, field, increment) {
 RedisIncrementBatch.prototype.flush = function () {
   var self = this;
   var redis = self.redis;
-  _.each(_.keys(self.hashtable), function (key) {
-    _.each(_.keys(self.hashtable[key]), function (field) {
+  Object.keys(self.hashtable).forEach(function (key) {
+    Object.keys(self.hashtable[key]).forEach(function (field) {
       redis.hincrby(key, field, self.hashtable[key][field]);
-      delete self.hashtable[key][field];
     });
-    delete self.hashtable[key];
   });
+  this.hashtable = {};
 };

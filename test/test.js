@@ -1,6 +1,6 @@
 var assert = require('assert');
 var sinon = require('sinon');
-var _ = require('underscore');
+var after = require('after');
 
 describe('RedisIncrementBatch', function () {
 
@@ -31,6 +31,7 @@ describe('RedisIncrementBatch', function () {
       try {
         var batch = new RedisIncrementBatch(redis);
         assert(batch);
+        assert(batch.options.flushAfter === 5000);
       } catch (err) {
         assert(false);
       }
@@ -38,8 +39,8 @@ describe('RedisIncrementBatch', function () {
 
     it('should override the default flushAfter if provided', function () {
       var redis = {};
-      var batch = new RedisIncrementBatch(redis, flushAfter);
-      assert(batch.flushAfter === flushAfter);
+      var batch = new RedisIncrementBatch(redis, { flushAfter: flushAfter });
+      assert(batch.options.flushAfter === flushAfter);
     });
 
   });
@@ -55,7 +56,7 @@ describe('RedisIncrementBatch', function () {
     beforeEach(function () {
       var redis = {};
       redis.hincrby = sinon.spy();
-      batch = new RedisIncrementBatch(redis, flushAfter);
+      batch = new RedisIncrementBatch(redis, { flushAfter: flushAfter });
     });
 
     it('should increment by 1 by default', function () {
@@ -102,11 +103,11 @@ describe('RedisIncrementBatch', function () {
     beforeEach(function () {
       redis = {};
       redis.hincrby = sinon.spy();
-      batch = new RedisIncrementBatch(redis, flushAfter);
+      batch = new RedisIncrementBatch(redis, { flushAfter: flushAfter });
     });
 
     it('should not flush when nothing is incremented', function (done) {
-      done = _.after(4, done);
+      done = after(4, done);
       var test = function () {
         assert(redis.hincrby.callCount === 0);
         done();
@@ -119,7 +120,7 @@ describe('RedisIncrementBatch', function () {
 
     it('should flush one key-field', function (done) {
       batch.increment(key1, fields[0]);
-      done = _.after(2, done);
+      done = after(2, done);
       var test = function () {
         assert(redis.hincrby.callCount === 1);
         assert(redis.hincrby.calledWith(key1, fields[0], 1));
@@ -133,7 +134,7 @@ describe('RedisIncrementBatch', function () {
       batch.increment(key1, fields[0]);
       batch.increment(key1, fields[2], 3);
       batch.increment(key1, fields[1], -40);
-      done = _.after(2, done);
+      done = after(2, done);
       var test = function () {
         assert(redis.hincrby.callCount === 3);
         assert(redis.hincrby.calledWith(key1, fields[0], 1));
@@ -148,7 +149,7 @@ describe('RedisIncrementBatch', function () {
     it('should flush several keys-field', function (done) {
       batch.increment(key1, fields[0]);
       batch.increment(key2, fields[2], 3);
-      done = _.after(2, done);
+      done = after(2, done);
       var test = function () {
         assert(redis.hincrby.callCount === 2);
         assert(redis.hincrby.calledWith(key1, fields[0], 1));
@@ -173,7 +174,7 @@ describe('RedisIncrementBatch', function () {
       batch.increment(key2, fields[0], 2);
       batch.increment(key2, fields[0], 2);
       batch.increment(key2, fields[0], 2);
-      done = _.after(2, done);
+      done = after(2, done);
       var test = function () {
         assert(redis.hincrby.callCount === 2);
         assert(redis.hincrby.calledWith(key1, fields[0], 9));
