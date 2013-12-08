@@ -8,7 +8,7 @@ describe('RedisBatch', function () {
   var key1 = 'key1';
   var key2 = 'key2';
   var fields = ['mobile', 'server', 'browser'];
-  var flushAfter = 250;
+  var flushAfter = 50;
 
   var redisSpy = function () {
     return {
@@ -168,7 +168,7 @@ describe('RedisBatch', function () {
   /**
    * hincrby tests
    */
-  /*
+  
   describe('hincrby', function () {
     
     var redis;
@@ -181,30 +181,30 @@ describe('RedisBatch', function () {
 
     describe('batching', function () {
 
-      it('should increment by 1 by default', function () {
-        assert(batch.hashtable[key1] === undefined);
-        batch.increment(key1, fields[0]);
-        assert(batch.hashtable[key1][fields[0]] === 1);
+      it('should hincrby 1 by default', function () {
+        assert(batch.batch.hincrby[key1] === undefined);
+        batch.hincrby(key1, fields[0]);
+        assert(batch.batch.hincrby[key1][fields[0]] === 1);
       });
 
-      it('should increment by a positive number if provided', function () {
-        assert(batch.hashtable[key1] === undefined);
-        batch.increment(key1, fields[2], 1238898);
-        assert(batch.hashtable[key1][fields[2]] === 1238898);
+      it('should hincrby a positive number if provided', function () {
+        assert(batch.batch.hincrby[key1] === undefined);
+        batch.hincrby(key1, fields[2], 1238898);
+        assert(batch.batch.hincrby[key1][fields[2]] === 1238898);
       });
 
-      it('should increment by a negative number if provided', function () {
-        assert(batch.hashtable[key2] === undefined);
-        batch.increment(key2, fields[1], -81726);
-        assert(batch.hashtable[key2][fields[1]] === -81726);
+      it('should hincrby a negative number if provided', function () {
+        assert(batch.batch.hincrby[key2] === undefined);
+        batch.hincrby(key2, fields[1], -81726);
+        assert(batch.batch.hincrby[key2][fields[1]] === -81726);
       });
 
-      it('should increment by a positive number after a negative number', function () {
-        assert(batch.hashtable[key2] === undefined);
-        batch.increment(key2, fields[1], -81726);
-        assert(batch.hashtable[key2][fields[1]] === -81726);
-        batch.increment(key2, fields[1], 81727);
-        assert(batch.hashtable[key2][fields[1]] === 1);
+      it('should hincrby a positive number after a negative number', function () {
+        assert(batch.batch.hincrby[key2] === undefined);
+        batch.hincrby(key2, fields[1], -81726);
+        assert(batch.batch.hincrby[key2][fields[1]] === -81726);
+        batch.hincrby(key2, fields[1], 81727);
+        assert(batch.batch.hincrby[key2][fields[1]] === 1);
       });
 
     });
@@ -212,89 +212,81 @@ describe('RedisBatch', function () {
     describe('flushing', function () {
 
       it('should not flush when nothing is incremented', function (done) {
-        done = after(4, done);
         var test = function () {
           assert(redis.hincrby.callCount === 0);
-          done();
         };
         setTimeout(test, flushes(1));
         setTimeout(test, flushes(2));
         setTimeout(test, flushes(3));
         setTimeout(test, flushes(4));
+        setTimeout(done, flushes(5));
       });
 
       it('should flush one key-field', function (done) {
-        batch.increment(key1, fields[0]);
-        done = after(2, done);
+        batch.hincrby(key1, fields[0]);
         var test = function () {
           assert(redis.hincrby.callCount === 1);
           assert(redis.hincrby.calledWith(key1, fields[0], 1));
-          done();
         };
         setTimeout(test, flushes(1));
         setTimeout(test, flushes(4));
+        setTimeout(done, flushes(5));
       });
 
       it('should flush several key-fields', function (done) {
-        batch.increment(key1, fields[0]);
-        batch.increment(key1, fields[2], 3);
-        batch.increment(key1, fields[1], -40);
-        done = after(2, done);
+        batch.hincrby(key1, fields[0]);
+        batch.hincrby(key1, fields[2], 3);
+        batch.hincrby(key1, fields[1], -40);
         var test = function () {
           assert(redis.hincrby.callCount === 3);
           assert(redis.hincrby.calledWith(key1, fields[0], 1));
           assert(redis.hincrby.calledWith(key1, fields[1], -40));
           assert(redis.hincrby.calledWith(key1, fields[2], 3));
-          done();
         };
         setTimeout(test, flushes(1));
         setTimeout(test, flushes(4));
+        setTimeout(done, flushes(5));
       });
 
       it('should flush several keys-field', function (done) {
-        batch.increment(key1, fields[0]);
-        batch.increment(key2, fields[2], 3);
-        done = after(2, done);
+        batch.hincrby(key1, fields[0]);
+        batch.hincrby(key2, fields[2], 3);
         var test = function () {
           assert(redis.hincrby.callCount === 2);
           assert(redis.hincrby.calledWith(key1, fields[0], 1));
           assert(redis.hincrby.calledWith(key2, fields[2], 3));
-          done();
         };
         setTimeout(test, flushes(1));
         setTimeout(test, flushes(4));
+        setTimeout(done, flushes(5));
       });
 
-      it('should flush multiple increments of a key-field as one hincrby', function (done) {
-        batch.increment(key1, fields[0]);
-        batch.increment(key1, fields[0]);
-        batch.increment(key1, fields[0]);
-        batch.increment(key1, fields[0]);
-        batch.increment(key1, fields[0]);
-        batch.increment(key1, fields[0]);
-        batch.increment(key1, fields[0]);
-        batch.increment(key1, fields[0]);
-        batch.increment(key1, fields[0]);
-        batch.increment(key2, fields[0], 2);
-        batch.increment(key2, fields[0], 2);
-        batch.increment(key2, fields[0], 2);
-        batch.increment(key2, fields[0], 2);
-        done = after(2, done);
+      it('should flush multiple hincrby of a key-field as one hincrby', function (done) {
+        batch.hincrby(key1, fields[0])
+          .hincrby(key1, fields[0])
+          .hincrby(key1, fields[0])
+          .hincrby(key1, fields[0])
+          .hincrby(key1, fields[0])
+          .hincrby(key1, fields[0])
+          .hincrby(key1, fields[0])
+          .hincrby(key1, fields[0])
+          .hincrby(key1, fields[0])
+          .hincrby(key2, fields[0], 2)
+          .hincrby(key2, fields[0], 2)
+          .hincrby(key2, fields[0], 2)
+          .hincrby(key2, fields[0], 3);
         var test = function () {
           assert(redis.hincrby.callCount === 2);
           assert(redis.hincrby.calledWith(key1, fields[0], 9));
-          assert(redis.hincrby.calledWith(key2, fields[0], 8));
-          done();
+          assert(redis.hincrby.calledWith(key2, fields[0], 9));
         };
         setTimeout(test, flushes(1));
         setTimeout(test, flushes(4));
+        setTimeout(done, flushes(5));
       });
 
     });
 
-
-    
-
-  });*/
+  });
 
 });
