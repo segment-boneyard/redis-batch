@@ -30,13 +30,13 @@ redisBatch.incrby('projectcounter', 12)
     .incrby('projectcounter', 4);
 
 /**
- * sadd batches by setkey
- * This will become a single "sadd mysetkey key1 key2 key3" when sent to redis.
+ * sadd batches by key
+ * This will become a single "sadd key member1 member2 member3" when sent to redis.
  */
 
-redisBatch.sadd('mysetkey', 'key1')
-    .sadd('mysetkey', 'key2')
-    .sadd('mysetkey', 'key3');
+redisBatch.sadd('key', 'member1')
+    .sadd('key', 'member2')
+    .sadd('key', 'member3');
 ```
 
 You can intermingle sadd, incrby and hincrby as you desire.

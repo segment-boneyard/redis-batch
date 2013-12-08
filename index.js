@@ -41,9 +41,9 @@ function RedisBatch (redis, options) {
  * @param {String} key
  */
 
-RedisBatch.prototype.sadd = function (set, key) {
-  if (this.sadd[set] === undefined) this.sadd[set] = {};
-  this.sadd[set][key] = true;
+RedisBatch.prototype.sadd = function (key, member) {
+  if (this.sadd[key] === undefined) this.sadd[key] = {};
+  this.sadd[key][member] = true;
 };
 
 /**
@@ -53,8 +53,8 @@ RedisBatch.prototype.sadd = function (set, key) {
 RedisBatch.prototype.saddFlush = function () {
   var self = this;
   var redis = self.redis;
-  Object.keys(self.sadd).forEach(function (set) {
-    redis.sadd(set, Object.keys(self.sadd[set]));
+  Object.keys(self.sadd).forEach(function (key) {
+    redis.sadd(key, Object.keys(self.sadd[key]));
   });
   this.sadd = {};
 };
