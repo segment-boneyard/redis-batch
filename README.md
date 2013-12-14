@@ -16,11 +16,11 @@ Redis-batch only supports commands that are "write-only" and make sense to be ba
 
 #### Keys
 - [ ] decr, decrby
-- [ ] incr, incrby
+- [x] incr, incrby
 - [ ] incrbyfloat
 
 #### Hash keys
-- [ ] hincrby
+- [x] hincrby
 - [ ] hincrbyfloat
 
 #### Sorted set score
@@ -48,7 +48,7 @@ Redis-batch only supports commands that are "write-only" and make sense to be ba
 
 #### Sets
 - [ ] srem
-- [ ] sadd
+- [x] sadd
 - [ ] smove
 - [ ] zadd
 - [ ] zrem
@@ -56,8 +56,8 @@ Redis-batch only supports commands that are "write-only" and make sense to be ba
 - [ ] zremrangebyscore
 
 ### Persistance
-- [ ] expire, pexpire, setex
-- [ ] expireat, pexpireat
+- [x] pexpire, expire, setex
+- [ ] pexpireat, expireat
 - [ ] persist
 
 ## Usage
