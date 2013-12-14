@@ -1,6 +1,6 @@
 
 test:
-	@./node_modules/.bin/mocha test
+	@./node_modules/.bin/mocha test/pexpire
 
 
 .PHONY: test

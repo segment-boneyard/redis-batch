@@ -4,7 +4,7 @@
   "description": "Batches commands like incrby, hincrby and sadd to Redis.",
   "version": "0.1.1",
   "author": "Peter Reinhardt <peter@segment.io>",
-  "main": "index.js",
+  "main": "lib/index.js",
   "license": "MIT",
   "scripts": {
     "test": "make test"

@@ -1,6 +1,6 @@
 var assert = require('assert');
 var sinon = require('sinon');
-var RedisBatch = require('../');
+var RedisBatch = require('../lib');
 
 describe('Constructor', function () {
 

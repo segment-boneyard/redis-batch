@@ -3,7 +3,7 @@ var sinon = require('sinon');
 var RedisSpy = require('./lib/redis-spy');
 var Flushes = require('./lib/flushes');
 
-var RedisBatch = require('../');
+var RedisBatch = require('../lib');
 
 /**
  * Testing data.
