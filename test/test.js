@@ -27,40 +27,6 @@ describe('RedisBatch', function () {
   };
 
   /**
-   * Constructor tests.
-   */
-
-  describe('Constructor', function () {
-
-    it('should error if not given a redis instance', function () {
-      try {
-        var batch = new RedisBatch();
-        assert(false);
-      } catch (err) {
-        assert(err);
-      }
-    });
-
-    it('should instantiate with just a redis', function () {
-      try {
-        var redis = redisSpy();
-        var batch = new RedisBatch(redis);
-        assert(batch);
-        assert.equal(batch.options.flushAfter, 5000);
-      } catch (err) {
-        assert(false);
-      }
-    });
-
-    it('should override the default flushAfter if provided', function () {
-      var redis = redisSpy();
-      var batch = new RedisBatch(redis, { flushAfter: flushAfter });
-      assert(batch.options.flushAfter === flushAfter);
-    });
-
-  });
-
-  /**
    * incrby tests
    */
   
