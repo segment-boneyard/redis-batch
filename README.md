@@ -12,41 +12,29 @@ YMMV.
 ## Commands supported
 Redis-batch only supports commands that are "write-only" and make sense to be batched. Of the 150+ Redis commands, redis-batch is only intended to support 34 of them. Not all of them are supported yet, feel free to pull request!
 
-### Incrementing
-
-#### Keys
+#### Incrementing
 - [ ] decr, decrby
 - [x] incr, incrby
 - [ ] incrbyfloat
-
-#### Hash keys
 - [x] hincrby
 - [ ] hincrbyfloat
-
-#### Sorted set score
 - [ ] zincrby
 
-### Setting and Removing
-
-#### Keys
+#### Setting and Removing
 - [ ] append
 - [ ] del
 - [ ] set, mset
 - [ ] setbit
 - [ ] rename
-
-#### Hash keys
 - [ ] hdel
 - [ ] hset, hmset
 
-#### Lists
 - [ ] lpush
 - [ ] rpush
 - [ ] lrem
 - [ ] lset
 - [ ] ltrim
 
-#### Sets
 - [ ] srem
 - [x] sadd
 - [ ] smove
@@ -55,7 +43,7 @@ Redis-batch only supports commands that are "write-only" and make sense to be ba
 - [ ] zremrangebyrank
 - [ ] zremrangebyscore
 
-### Persistance
+#### Persistance
 - [x] pexpire, expire, setex
 - [ ] pexpireat, expireat
 - [ ] persist
