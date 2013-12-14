@@ -15,50 +15,50 @@ Redis-batch only supports commands that are "write-only" and make sense to be ba
 ### Incrementing
 
 #### Keys
-[ ] decr, decrby
-[ ] incr, incrby
-[ ] incrbyfloat
+- [ ] decr, decrby
+- [ ] incr, incrby
+- [ ] incrbyfloat
 
 #### Hash keys
-[ ] hincrby
-[ ] hincrbyfloat
+- [ ] hincrby
+- [ ] hincrbyfloat
 
 #### Sorted set score
-[ ] zincrby
+- [ ] zincrby
 
 ### Setting and Removing
 
 #### Keys
-[ ] append
-[ ] del
-[ ] set, mset
-[ ] setbit
-[ ] rename
+- [ ] append
+- [ ] del
+- [ ] set, mset
+- [ ] setbit
+- [ ] rename
 
 #### Hash keys
-[ ] hdel
-[ ] hset, hmset
+- [ ] hdel
+- [ ] hset, hmset
 
 #### Lists
-[ ] lpush
-[ ] rpush
-[ ] lrem
-[ ] lset
-[ ] ltrim
+- [ ] lpush
+- [ ] rpush
+- [ ] lrem
+- [ ] lset
+- [ ] ltrim
 
 #### Sets
-[ ] srem
-[ ] sadd
-[ ] smove
-[ ] zadd
-[ ] zrem
-[ ] zremrangebyrank
-[ ] zremrangebyscore
+- [ ] srem
+- [ ] sadd
+- [ ] smove
+- [ ] zadd
+- [ ] zrem
+- [ ] zremrangebyrank
+- [ ] zremrangebyscore
 
 ### Persistance
-[ ] expire, pexpire, setex
-[ ] expireat, pexpireat
-[ ] persist
+- [ ] expire, pexpire, setex
+- [ ] expireat, pexpireat
+- [ ] persist
 
 ## Usage
 
