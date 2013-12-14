@@ -4,8 +4,6 @@ var RedisBatch = require('../');
 
 describe('Constructor', function () {
 
-  var flushAfter = 10;
-
   it('should error if not given a redis instance', function () {
     try {
       var batch = new RedisBatch();
@@ -26,8 +24,8 @@ describe('Constructor', function () {
   });
 
   it('should override the default flushAfter if provided', function () {
-    var batch = new RedisBatch({}, { flushAfter: flushAfter });
-    assert(batch.options.flushAfter === flushAfter);
+    var batch = new RedisBatch({}, { flushAfter: 10 });
+    assert(batch.options.flushAfter === 10);
   });
 
 });
