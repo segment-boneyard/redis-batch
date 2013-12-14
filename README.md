@@ -20,7 +20,7 @@ Redis-batch only supports commands that are "write-only" and make sense to be ba
 - [ ] hincrbyfloat
 - [ ] zincrby
 
-#### Setting and Removing
+#### Keys
 - [ ] append
 - [ ] del
 - [ ] set, mset
@@ -29,12 +29,14 @@ Redis-batch only supports commands that are "write-only" and make sense to be ba
 - [ ] hdel
 - [ ] hset, hmset
 
+#### Lists
 - [ ] lpush
 - [ ] rpush
 - [ ] lrem
 - [ ] lset
 - [ ] ltrim
 
+#### Sets
 - [ ] srem
 - [x] sadd
 - [ ] smove
