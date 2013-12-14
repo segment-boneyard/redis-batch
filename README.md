@@ -3,9 +3,11 @@ redis-batch
 
 Redis Batch wraps a [node_redis](https://github.com/mranney/node_redis) instance, and batches write commands like hincrby, incrby and sadd to Redis. For systems generating *lots* of writes to Redis, this can be a significant performance increase for Redis and for the machines issuing the write commands.
 
-When we ployed redis-batch on Segment.io:
+When we deployed redis-batch within Segment.io's server cluster:
 + **Redis** CPU dropped by XX% and network by YY%
 + **Servers issuing commands** CPU dropped by XX% and network by YY%
+
+YMMV.
 
 ## Usage
 
