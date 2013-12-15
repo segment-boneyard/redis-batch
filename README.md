@@ -13,7 +13,7 @@ YMMV.
 Redis-batch only supports "write" commands that make sense to be batched. Of the 150+ Redis commands, redis-batch is only intended to support 34. Not all of them are supported yet, feel free to pull request!
 
 #### Incrementing
-- [ ] decr, decrby
+- [x] decr, decrby
 - [x] incr, incrby
 - [ ] incrbyfloat
 - [x] hincrby
@@ -46,7 +46,7 @@ Redis-batch only supports "write" commands that make sense to be batched. Of the
 - [ ] zremrangebyscore
 
 #### Persistance
-- [x] pexpire, expire, setex
+- [x] pexpire, expire
 - [ ] pexpireat, expireat
 - [ ] persist
 

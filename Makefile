@@ -1,6 +1,6 @@
 
 test:
-	@./node_modules/.bin/mocha test/incr
+	@./node_modules/.bin/mocha test
 
 
 .PHONY: test

@@ -22,21 +22,22 @@ var flushes = Flushes(flushAfter);
 
 
 /**
- * pexpire tests
+ * expire tests
  */
 
-describe('pexpire', function () {
+describe('expire', function () {
   
   var redis;
   var batch;
   
   beforeEach(function () {
-    redis = RedisSpy('pexpire');
+    redis = RedisSpy('pexpire', 'expire');
     batch = new RedisBatch(redis, { flushAfter: flushAfter });
   });
 
   it('should not flush when no pexpires are added', function (done) {
     var test = function () {
+      assert.equal(redis.expire.callCount, 0);
       assert.equal(redis.pexpire.callCount, 0);
     };
     setTimeout(test, flushes(1));
@@ -49,6 +50,21 @@ describe('pexpire', function () {
   it('should flush a single pexpire', function (done) {
     batch.pexpire(key1, expire);
     var test = function () {
+      assert.equal(redis.pexpire.callCount, 1);
+      assert(redis.pexpire.calledWith(key1, expire));
+    };
+    setTimeout(test, flushes(1));
+    setTimeout(test, flushes(4));
+    setTimeout(done, flushes(5));
+  });
+
+  it('should flush a single expire for one key', function (done) {
+    batch.expire(key1, expire*9)
+      .pexpire(key1, expire*3)
+      .expire(key1, expire*2)
+      .expire(key1, expire/1000);
+    var test = function () {
+      assert.equal(redis.expire.callCount, 0);
       assert.equal(redis.pexpire.callCount, 1);
       assert(redis.pexpire.calledWith(key1, expire));
     };
