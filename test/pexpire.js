@@ -22,10 +22,10 @@ var flushes = Flushes(flushAfter);
 
 
 /**
- * expire tests
+ * pexpire tests
  */
 
-describe('expire', function () {
+describe('pexpire', function () {
   
   var redis;
   var batch;

@@ -48,7 +48,7 @@ Redis-batch only supports "write" commands that make sense to be batched. Of the
 #### Persistance
 - [x] pexpire, expire
 - [ ] pexpireat, expireat
-- [ ] persist
+- [x] persist
 
 ## Usage
 
