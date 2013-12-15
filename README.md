@@ -23,7 +23,7 @@ Redis-batch only supports "write" commands that make sense to be batched. Of the
 #### Keys
 - [ ] append
 - [ ] del
-- [ ] set, mset
+- [x] set, mset
 - [ ] setbit
 - [ ] rename
 - [ ] hdel
