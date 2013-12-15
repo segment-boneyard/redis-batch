@@ -10,7 +10,7 @@ When we deployed redis-batch within Segment.io's server cluster:
 YMMV.
 
 ## Commands supported
-Redis-batch only supports "write" commands that make sense to be batched. Of the 150+ Redis commands, redis-batch is only intended to support 34. Not all of them are supported yet, feel free to pull request!
+Redis-batch only supports "write" commands that make sense to be batched. Of the 150+ Redis commands, redis-batch is only intended to support 34. Currently it supports 12. Not all of them are supported yet, feel free to pull request!
 
 #### Incrementing
 - [x] decr, decrby
