@@ -16,7 +16,7 @@ Redis-batch only supports "write" commands that make sense to be batched. Of the
 - [x] decr, decrby
 - [x] incr, incrby
 - [ ] incrbyfloat
-- [x] hincrby
+- [x] hincr, hincrby
 - [ ] hincrbyfloat
 - [ ] zincrby
 
