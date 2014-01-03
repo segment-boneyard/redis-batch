@@ -1,6 +1,8 @@
 redis-batch
 ===========
 
+[![Build Status](https://magnum.travis-ci.com/segmentio/redis-batch.png?token=exthRyNRTLjkmpmb4FUi&branch=master)](https://magnum.travis-ci.com/segmentio/cloud)
+
 Redis Batch wraps a [node_redis](https://github.com/mranney/node_redis) instance, and batches write commands like hincrby, incrby and sadd to Redis. For systems generating *lots* of writes to Redis, this can be a significant performance increase for Redis and for the machines issuing the write commands.
 
 When we deployed redis-batch within Segment.io's server cluster:
