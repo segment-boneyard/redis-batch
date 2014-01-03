@@ -3,6 +3,8 @@ script: make test
 notifications:
   email:
     - engineering@segment.io
+services:
+  - redis
 node_js:
   - "0.11"
   - "0.10"
