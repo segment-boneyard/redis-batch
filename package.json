@@ -10,10 +10,11 @@
     "test": "make test"
   },
   "dependencies": {
-    "defaults" : "1.0.0"
+    "defaults": "1.0.0"
   },
   "devDependencies": {
     "mocha": "*",
-    "sinon": "*"
+    "sinon": "*",
+    "redis": "~0.10.0"
   }
 }
