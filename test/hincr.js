@@ -1,5 +1,4 @@
 var assert = require('assert');
-var sinon = require('sinon');
 var RedisSpy = require('./lib/redis-spy');
 var Flushes = require('./lib/flushes');
 
