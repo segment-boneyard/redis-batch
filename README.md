@@ -32,7 +32,7 @@ Redis-batch only supports "write" commands that make sense to be batched. Of the
 - [ ] hset, hmset
 
 #### Lists
-- [ ] lpush
+- [x] lpush
 - [ ] rpush
 - [ ] lrem
 - [ ] lset
